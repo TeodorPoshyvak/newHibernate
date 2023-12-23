@@ -1,23 +1,23 @@
 package org.example.entityDAO.client;
 
 import org.example.entity.Client;
+import org.example.entityDAO.Dao;
 import org.example.hibernate.HibernateUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import java.util.List;
 
-public class ClientDaoImpl implements ClientDao {
+public class ClientDaoImpl implements Dao<Client> {
 
     SessionFactory sessionFactory = HibernateUtils.getInstance().getSessionFactory();
 
     @Override
-    public boolean createClient(Client client) {
+    public boolean createEntity(Client entity) {
         boolean result = false;
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.persist(client);
+            session.persist(entity);
             transaction.commit();
             result = true;
         } catch (Exception e) {
@@ -27,11 +27,11 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public boolean updateClient(Client client) {
+    public boolean updateEntity(Client entity) {
         boolean result = false;
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.merge(client);
+            session.merge(entity);
             transaction.commit();
             result = true;
         } catch (Exception e) {
@@ -41,21 +41,17 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getClientByID(Long clientId) {
+    public void deleteEntity(Client entity) {
         try (Session session = sessionFactory.openSession()) {
-            return session.get(Client.class, clientId);
+            Transaction transaction = session.beginTransaction();
+            session.remove(entity);
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    @Override
-    public List<Client> getAllClient() {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Client", Client.class).list();
-        }
-    }
-
-    @Override
-    public void deleteClientByID(Long clientId) {
+    public void deleteEntityByID(Long clientId) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             Client client = session.get(Client.class, clientId);
@@ -66,14 +62,17 @@ public class ClientDaoImpl implements ClientDao {
         }
     }
 
+    public Client getEntityByID(Long clientId) {
+        try (Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            Client client = session.get(Client.class, clientId);
+            return client;
+        }
+    }
+
     @Override
-    public void deleteClient(Client client) {
+    public List<Client> getAllEntity() {
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            session.remove(client);
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
+            return session.createQuery("from Client", Client.class).list();
         }
     }
 }

@@ -1,10 +1,13 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.ColumnTransformer;
+import lombok.Getter;
+import lombok.Setter;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "planet")
 public class Planet {
@@ -15,7 +18,16 @@ public class Planet {
     @Column(unique = true)
     String name;
 
+
     public void setId(String id) {
         this.id = (id != null) ? id.toUpperCase() : null;
+    }
+
+    @Override
+    public String toString() {
+        return "Planet{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

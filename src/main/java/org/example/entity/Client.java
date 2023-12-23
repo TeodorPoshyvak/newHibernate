@@ -2,6 +2,8 @@ package org.example.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -13,4 +15,8 @@ public class Client {
 
     @Column(length = 200)
     String name;
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    private Set<Ticket> tickets = new HashSet<>();
+
 }

@@ -1,23 +1,23 @@
 package org.example.entityDAO.planet;
 
 import org.example.entity.Planet;
+import org.example.entityDAO.Dao;
 import org.example.hibernate.HibernateUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import java.util.List;
 
-public class PlanetDaoImpl implements PlanetDao {
+public class PlanetDaoImpl implements Dao<Planet> {
 
     private SessionFactory sessionFactory = HibernateUtils.getInstance().getSessionFactory();
 
     @Override
-    public boolean createPlanet(Planet planet) {
+    public boolean createEntity(Planet entity) {
         boolean result = false;
         try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
-            session.persist(planet);
+            session.persist(entity);
             tx.commit();
             result = true;
         } catch (Exception e) {
@@ -27,11 +27,11 @@ public class PlanetDaoImpl implements PlanetDao {
     }
 
     @Override
-    public boolean updatePlanet(Planet planet) {
+    public boolean updateEntity(Planet entity) {
         boolean result = false;
         try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
-            session.merge(planet);
+            session.merge(entity);
             tx.commit();
             result = true;
         } catch (Exception e) {
@@ -40,11 +40,22 @@ public class PlanetDaoImpl implements PlanetDao {
         return result;
     }
 
+
     @Override
-    public void deletePlanetByID(String planetId) {
+    public void deleteEntity(Planet entity) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            Planet planet = session.get(Planet.class, planetId.toUpperCase());
+            session.remove(entity);
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteByID(String entityId) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Planet planet = session.get(Planet.class, entityId.toUpperCase());
             session.remove(planet);
             transaction.commit();
         } catch (Exception e) {
@@ -52,27 +63,14 @@ public class PlanetDaoImpl implements PlanetDao {
         }
     }
 
-    @Override
-    public void deletePlanet(Planet planet) {
-        try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            session.remove(planet);
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public Planet getPlanetByID(String planetId) {
+    public Planet getEntityByID(String planetId) {
         try (Session session = sessionFactory.openSession()) {
             return session.get(Planet.class, planetId);
         }
     }
-
     @Override
-    public List<Planet> getAllPlanet() {
-        try (Session session = sessionFactory.openSession()) {
+    public List<Planet> getAllEntity() {
+        try(Session session = sessionFactory.openSession()){
             return session.createQuery("from Planet", Planet.class).list();
         }
     }
